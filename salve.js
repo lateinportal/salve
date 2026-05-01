@@ -887,6 +887,15 @@ function resetS10() {
   if (attEl) attEl.textContent = "Versuche: 0 / 3";
 }
 
+// ── Sentence groups for S10 (each sub-array: [ids in sentence, correct id]) ──
+var s10Sentences = [
+  { ids: [1, 2, 3],   correct: 2  },  // Publius avus est.
+  { ids: [5, 6, 7],   correct: 6  },  // Delia serva est.
+  { ids: [9, 10, 11], correct: 10 },  // Issa catella est.
+  { ids: [13, 14, 15],correct: 14 },  // Aulus filius est.
+  { ids: [17, 18, 19],correct: 18 },  // Quintus pater est.
+];
+
 // ── Check ─────────────────────────────────────────
 function checkS10() {
   if (s10Locked) return;
@@ -905,16 +914,19 @@ function checkS10() {
     return { id: tok.id, state: state };
   });
 
-  var correctHits = results.filter(function (r) {
-    return r.state === "correct";
-  }).length;
-  var totalCorrect = s10Data.tokens.filter(function (t) {
-    return t.correct;
-  }).length;
-  var incorrectHits = results.filter(function (r) {
-    return r.state === "incorrect";
-  }).length;
-  var allPerfect = correctHits === totalCorrect && incorrectHits === 0;
+  // Sentence-based scoring: 1 pt per sentence if the Prädikatsnomen is marked
+  // AND no other word in that sentence is marked.
+  var sentenceScores = s10Sentences.map(function (sent) {
+    var pnMarked = s10State.marked.indexOf(sent.correct) !== -1;
+    var wrongMarked = sent.ids.some(function (id) {
+      return id !== sent.correct && s10State.marked.indexOf(id) !== -1;
+    });
+    return pnMarked && !wrongMarked; // true = 1 pt
+  });
+  var earnedPoints = sentenceScores.filter(Boolean).length;
+  var totalPoints = s10Sentences.length; // 5
+
+  var allPerfect = earnedPoints === totalPoints;
 
   var fb = document.getElementById("fb-s10");
   var btn = document.getElementById("btn-s10");
@@ -926,7 +938,7 @@ function checkS10() {
     _applyTokenStates(results);
     fb.className = "feedback show ok";
     fb.textContent =
-      "Richtig! Alle " + totalCorrect + " Prädikatsnomen korrekt markiert.";
+      "Richtig! Alle " + totalPoints + " Prädikatsnomen korrekt markiert.";
     btn.disabled = true;
     if (rst) rst.disabled = true;
     s10Locked = true;
@@ -976,11 +988,10 @@ function checkS10() {
 
     fb.className = "feedback show err";
     fb.textContent =
-      correctHits +
+      earnedPoints +
       " von " +
-      totalCorrect +
-      " Prädikatsnomen gefunden." +
-      (incorrectHits > 0 ? " " + incorrectHits + " falsch markiert." : "") +
+      totalPoints +
+      " Sätzen richtig." +
       " Klicke auf ein gelbes Wort für einen Hinweis.";
     if (next) next.style.display = "inline-block";
     markNav("s10", false);
@@ -1968,8 +1979,16 @@ function s15GetEarnedPoints(id, st) {
     return correct * 0.5; // 0.5 pt per input, 4 total
   }
   if (id === "s10") {
-    // All-or-nothing token task – no partial DOM state after fail
-    return 0;
+    // Sentence-based: 1 pt per sentence where PN is marked and no wrong word is marked
+    var pts = 0;
+    s10Sentences.forEach(function (sent) {
+      var pnMarked = s10State.marked.indexOf(sent.correct) !== -1;
+      var wrongMarked = sent.ids.some(function (id2) {
+        return id2 !== sent.correct && s10State.marked.indexOf(id2) !== -1;
+      });
+      if (pnMarked && !wrongMarked) pts++;
+    });
+    return pts;
   }
   if (id === "s11") {
     return 0; // token multi-marker: no partial credit

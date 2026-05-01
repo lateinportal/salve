@@ -887,15 +887,6 @@ function resetS10() {
   if (attEl) attEl.textContent = "Versuche: 0 / 3";
 }
 
-// ── Sentence groups for S10 (each sub-array: [ids in sentence, correct id]) ──
-var s10Sentences = [
-  { ids: [1, 2, 3],   correct: 2  },  // Publius avus est.
-  { ids: [5, 6, 7],   correct: 6  },  // Delia serva est.
-  { ids: [9, 10, 11], correct: 10 },  // Issa catella est.
-  { ids: [13, 14, 15],correct: 14 },  // Aulus filius est.
-  { ids: [17, 18, 19],correct: 18 },  // Quintus pater est.
-];
-
 // ── Check ─────────────────────────────────────────
 function checkS10() {
   if (s10Locked) return;
@@ -914,19 +905,16 @@ function checkS10() {
     return { id: tok.id, state: state };
   });
 
-  // Sentence-based scoring: 1 pt per sentence if the Prädikatsnomen is marked
-  // AND no other word in that sentence is marked.
-  var sentenceScores = s10Sentences.map(function (sent) {
-    var pnMarked = s10State.marked.indexOf(sent.correct) !== -1;
-    var wrongMarked = sent.ids.some(function (id) {
-      return id !== sent.correct && s10State.marked.indexOf(id) !== -1;
-    });
-    return pnMarked && !wrongMarked; // true = 1 pt
-  });
-  var earnedPoints = sentenceScores.filter(Boolean).length;
-  var totalPoints = s10Sentences.length; // 5
-
-  var allPerfect = earnedPoints === totalPoints;
+  var correctHits = results.filter(function (r) {
+    return r.state === "correct";
+  }).length;
+  var totalCorrect = s10Data.tokens.filter(function (t) {
+    return t.correct;
+  }).length;
+  var incorrectHits = results.filter(function (r) {
+    return r.state === "incorrect";
+  }).length;
+  var allPerfect = correctHits === totalCorrect && incorrectHits === 0;
 
   var fb = document.getElementById("fb-s10");
   var btn = document.getElementById("btn-s10");
@@ -938,7 +926,7 @@ function checkS10() {
     _applyTokenStates(results);
     fb.className = "feedback show ok";
     fb.textContent =
-      "Richtig! Alle " + totalPoints + " Prädikatsnomen korrekt markiert.";
+      "Richtig! Alle " + totalCorrect + " Prädikatsnomen korrekt markiert.";
     btn.disabled = true;
     if (rst) rst.disabled = true;
     s10Locked = true;
@@ -988,10 +976,11 @@ function checkS10() {
 
     fb.className = "feedback show err";
     fb.textContent =
-      earnedPoints +
+      correctHits +
       " von " +
-      totalPoints +
-      " Sätzen richtig." +
+      totalCorrect +
+      " Prädikatsnomen gefunden." +
+      (incorrectHits > 0 ? " " + incorrectHits + " falsch markiert." : "") +
       " Klicke auf ein gelbes Wort für einen Hinweis.";
     if (next) next.style.display = "inline-block";
     markNav("s10", false);
@@ -1075,6 +1064,15 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+// ── Sentence groups for S11 (token IDs grouped by sentence) ──
+var s11Sentences = [
+  ["1", "2"],
+  ["3", "4"],
+  ["5", "6"],
+  ["7", "8", "9", "10"],
+  ["11", "12", "13"],
+];
+
 function checkS11() {
   if (s11Locked) return;
   s11Tries++;
@@ -1082,28 +1080,30 @@ function checkS11() {
   if (attEl) attEl.textContent = "Versuche: " + s11Tries + " / 3";
 
   var tokens = document.querySelectorAll("#mk-s11 .s11-token");
-  var correct = 0;
-  var total = tokens.length;
 
-  // Check each token
-  var allCorrect = true;
+  // Build a map id → { el, expected, given, ok }
+  var tokenMap = {};
   tokens.forEach(function (el) {
     var id = el.dataset.id;
     var expected = el.dataset.correct;
     var given = s11TokenState[id] || null;
-    if (given !== expected) allCorrect = false;
-    else correct++;
+    tokenMap[id] = { el: el, expected: expected, given: given, ok: given === expected };
   });
+
+  // Sentence-based scoring: 1 pt if ALL tokens in that sentence are correct
+  var sentenceScores = s11Sentences.map(function (ids) {
+    return ids.every(function (id) { return tokenMap[id] && tokenMap[id].ok; });
+  });
+  var earnedPoints = sentenceScores.filter(Boolean).length;
+  var totalPoints = s11Sentences.length; // 5
+  var allPerfect = earnedPoints === totalPoints;
 
   var fb = document.getElementById("fb-s11");
   var btn = document.getElementById("btn-s11");
   var next = document.getElementById("weiter-s11");
 
-  if (allCorrect) {
-    // All correct — green borders, lock
-    tokens.forEach(function (el) {
-      el.classList.add("s11-correct");
-    });
+  if (allPerfect) {
+    tokens.forEach(function (el) { el.classList.add("s11-correct"); });
     fb.className = "feedback show ok";
     fb.textContent = "Richtig! Alle Satzglieder korrekt bestimmt.";
     btn.disabled = true;
@@ -1114,7 +1114,7 @@ function checkS11() {
     fb.className = "feedback show warn";
     fb.textContent = "Das ist noch nicht richtig.";
   } else {
-    // Final — reveal with yellow + popover hints
+    // Final — reveal with green/yellow + popover hints
     s11Locked = true;
     btn.disabled = true;
 
@@ -1126,16 +1126,12 @@ function checkS11() {
 
     tokens.forEach(function (el) {
       var id = el.dataset.id;
-      var expected = el.dataset.correct;
-      var given = s11TokenState[id] || null;
-
-      if (given === expected) {
+      if (tokenMap[id].ok) {
         el.classList.add("s11-correct");
       } else {
-        // Wrong or missing — yellow border, keep background, popover
         el.classList.add("s11-wrong");
         el.dataset.solutionTrigger = "1";
-        var hint = markerLabels[expected];
+        var hint = markerLabels[tokenMap[id].expected];
         el.addEventListener("click", function () {
           showSolutionPopover(el, hint, true);
         });
@@ -1144,10 +1140,10 @@ function checkS11() {
 
     fb.className = "feedback show err";
     fb.textContent =
-      correct +
+      earnedPoints +
       " von " +
-      total +
-      " Satzglieder korrekt. Klicke auf ein gelbes Wort für einen Hinweis.";
+      totalPoints +
+      " Sätzen richtig. Klicke auf ein gelbes Wort für einen Hinweis.";
     if (next) next.style.display = "inline-block";
     markNav("s11", false);
   }
@@ -1979,19 +1975,20 @@ function s15GetEarnedPoints(id, st) {
     return correct * 0.5; // 0.5 pt per input, 4 total
   }
   if (id === "s10") {
-    // Sentence-based: 1 pt per sentence where PN is marked and no wrong word is marked
-    var pts = 0;
-    s10Sentences.forEach(function (sent) {
-      var pnMarked = s10State.marked.indexOf(sent.correct) !== -1;
-      var wrongMarked = sent.ids.some(function (id2) {
-        return id2 !== sent.correct && s10State.marked.indexOf(id2) !== -1;
-      });
-      if (pnMarked && !wrongMarked) pts++;
-    });
-    return pts;
+    // All-or-nothing token task – no partial DOM state after fail
+    return 0;
   }
   if (id === "s11") {
-    return 0; // token multi-marker: no partial credit
+    // Sentence-based: 1 pt per sentence only if ALL tokens in it are correct
+    var pts = 0;
+    s11Sentences.forEach(function (ids) {
+      var allOk = ids.every(function (tid) {
+        var el = document.querySelector("#mk-s11 .s11-token[data-id='" + tid + "']");
+        return el && el.classList.contains("s11-correct");
+      });
+      if (allOk) pts++;
+    });
+    return pts;
   }
   if (id === "s12") {
     var correct = document.querySelectorAll(".s12-slot.ok").length;

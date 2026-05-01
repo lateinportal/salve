@@ -587,7 +587,8 @@ document.addEventListener("click", function (e) {
   if (
     pop &&
     pop.style.display !== "none" &&
-    !e.target.dataset.solutionTrigger
+    !e.target.dataset.solutionTrigger &&
+    !(e.target.closest && e.target.closest("[data-solution-trigger]"))
   ) {
     hideSolutionPopover();
   }
@@ -2886,6 +2887,33 @@ function salveRestore() {
   }
   reapplyDragDropClasses(d.s2Slots,  s2CorrectMap,  d.s2Locked);
   reapplyDragDropClasses(d.s12Slots, s12CorrectMap, d.s12Locked);
+
+  // ── Rebuild s2Wrong after restore so popovers work ──
+  if (d.s2Locked && d.s2Slots) {
+    s2Wrong = {};
+    Object.keys(d.s2Slots).forEach(function(slotId) {
+      var slot   = document.getElementById(slotId);
+      if (!slot || !slot.classList.contains("wrong")) return;
+      var expectedChipId = s2CorrectMap[slotId];
+      var correctChip    = document.getElementById(expectedChipId);
+      s2Wrong[slotId] = {
+        el:      slot,
+        correct: correctChip ? correctChip.textContent : "?"
+      };
+    });
+    // Also handle slots that were empty (no chip placed) when locked
+    Object.keys(s2CorrectMap).forEach(function(slotId) {
+      if (s2Wrong[slotId]) return; // already handled above
+      var slot = document.getElementById(slotId);
+      if (!slot || !slot.classList.contains("wrong")) return;
+      var expectedChipId = s2CorrectMap[slotId];
+      var correctChip    = document.getElementById(expectedChipId);
+      s2Wrong[slotId] = {
+        el:      slot,
+        correct: correctChip ? correctChip.textContent : "?"
+      };
+    });
+  }
 
   // S14: category-based correctness
   if (d.s14Locked && d.s14Slots) {

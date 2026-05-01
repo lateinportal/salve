@@ -889,11 +889,11 @@ function resetS10() {
 
 // ── Sentence groups for S10 (each entry: ids in sentence + correct PN id) ──
 var s10Sentences = [
-  { ids: [1, 2, 3],    correct: 2  },  // Publius avus est.
-  { ids: [5, 6, 7],    correct: 6  },  // Delia serva est.
-  { ids: [9, 10, 11],  correct: 10 },  // Issa catella est.
-  { ids: [13, 14, 15], correct: 14 },  // Aulus filius est.
-  { ids: [17, 18, 19], correct: 18 },  // Quintus pater est.
+  { ids: [1, 2, 3, 4],    correct: 2  },  // Publius avus est. Venit.
+  { ids: [5, 6, 7, 8],    correct: 6  },  // Delia serva est. Laborat.
+  { ids: [9, 10, 11, 12], correct: 10 },  // Issa catella est. Currit.
+  { ids: [13, 14, 15, 16],correct: 14 },  // Aulus filius est. Ludit.
+  { ids: [17, 18, 19],    correct: 18 },  // Quintus pater est.
 ];
 
 // ── Check ─────────────────────────────────────────

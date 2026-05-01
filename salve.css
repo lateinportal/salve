@@ -3357,10 +3357,6 @@ body {
 .s15-bronze{ background: linear-gradient(135deg,#fdf8f4 0%,#f5e6d6 100%); }
 .s15-passed{ background: linear-gradient(135deg,#f9fafb 0%,#f3f4f6 100%); }
 .s15-failed{ background: linear-gradient(135deg,#fff5f5 0%,#fee2e2 100%); }
-.s15-medal-pending { background: linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%); }
-.s15-medal-pending .s15-score-label { font-size: 1.1rem; color: #374151; }
-.s15-medal-pending .s15-score-sublabel { font-size: 0.82rem; color: #9ca3af; }
-.s15-medal-pending .s15-medal-rays { display: none; }
 
 /* Medal + rays wrapper */
 .s15-medal-wrap {
@@ -3471,13 +3467,30 @@ body {
 }
 
 /* Progress bar */
+.s15-progress-wrap {
+  position: relative;
+  max-width: 380px;
+  margin: 12px auto 20px;
+}
 .s15-progress-track {
   background: #e5e7eb;
   border-radius: 999px;
   height: 14px;
-  margin: 12px auto 10px;
-  max-width: 380px;
   overflow: hidden;
+}
+/* Gold threshold marker at 85% */
+.s15-progress-wrap::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  left: 85%;
+  width: 2px;
+  background: #f59e0b;
+  border-radius: 2px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 1;
 }
 .s15-progress-fill {
   height: 100%;
@@ -3564,7 +3577,7 @@ body {
 
 .s15-task-row {
   display: grid;
-  grid-template-columns: 24px 1fr 80px 72px 22px;
+  grid-template-columns: 24px 1fr 80px 72px 22px 26px;
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
@@ -3629,6 +3642,39 @@ body {
 .s15-row-icon-info   { background: #dbeafe; color: #1d4ed8; }
 .s15-row-icon-pending{ background: #f3f4f6; color: #9ca3af; }
 
+/* ── Reset button ── */
+.s15-row-reset {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #9ca3af;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.1s;
+  padding: 0;
+  flex-shrink: 0;
+}
+.s15-row-reset:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+  transform: rotate(-30deg) scale(1.1);
+}
+.s15-row-reset:active {
+  transform: rotate(-60deg) scale(0.95);
+}
+.s15-row-reset-placeholder {
+  width: 26px;
+  height: 26px;
+  display: inline-block;
+}
+
 
 
 /* ── Next lesson button ── */
@@ -3653,4 +3699,157 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(59,130,246,.45);
   color: #fff;
+}
+
+/* ══════════════════════════════════════════════
+   Lehrercode Modal
+══════════════════════════════════════════════ */
+.lc-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.lc-overlay.active {
+  display: flex;
+  animation: lc-fade-in 0.2s ease;
+}
+@keyframes lc-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.lc-modal {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px 28px 24px;
+  width: 100%;
+  max-width: 360px;
+  margin: 16px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,.18);
+  animation: lc-slide-up 0.25s cubic-bezier(.175,.885,.32,1.275);
+}
+@keyframes lc-slide-up {
+  from { transform: translateY(24px) scale(0.96); opacity: 0; }
+  to   { transform: translateY(0)    scale(1);    opacity: 1; }
+}
+
+.lc-icon {
+  font-size: 42px;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.lc-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+
+.lc-sub {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.lc-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 2px solid #e5e7eb;
+  font-size: 20px;
+  text-align: center;
+  letter-spacing: 0.25em;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  color: #1a1a1a;
+  background: #f9fafb;
+}
+.lc-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+  background: #fff;
+}
+.lc-input.lc-input-error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239,68,68,.12);
+  animation: lc-shake 0.35s ease;
+}
+@keyframes lc-shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+
+.lc-error {
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: 8px;
+  min-height: 18px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.lc-error.visible {
+  opacity: 1;
+}
+
+.lc-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.lc-btn {
+  flex: 1;
+  padding: 11px 0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.1s, box-shadow 0.1s, background 0.15s;
+}
+.lc-btn:active {
+  transform: scale(0.97);
+}
+
+.lc-btn-cancel {
+  background: #f3f4f6;
+  color: #374151;
+}
+.lc-btn-cancel:hover {
+  background: #e5e7eb;
+}
+
+.lc-btn-confirm {
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(59,130,246,.3);
+}
+.lc-btn-confirm:hover {
+  box-shadow: 0 6px 16px rgba(59,130,246,.4);
+  transform: translateY(-1px);
+}
+
+/* ── S15 Medal card: pending state after reset ── */
+.s15-medal-card.s15-pending-state {
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+}
+.s15-pending-state .s15-score-label {
+  display: none;
+}
+.s15-pending-state .s15-score-sublabel {
+  font-size: 15px;
+  color: #6b7280;
+  font-style: italic;
+  margin-top: 8px;
 }

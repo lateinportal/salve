@@ -2628,6 +2628,9 @@ function salveCollectState() {
     s14Locked:    s14Locked,
     s14Slots:     collectSlots(".s14-slot"),
 
+    // Reset tracking
+    s15ResetIds:  JSON.parse(JSON.stringify(s15ResetIds)),
+
     // Feedback
     feedbacks:    collectFeedback("[id^='fb-']"),
 
@@ -2744,6 +2747,11 @@ function salveRestore() {
       el.className   = d.feedbacks[id].className;
       el.textContent = d.feedbacks[id].text;
     });
+  }
+
+  // ── reset tracking ──
+  if (d.s15ResetIds) {
+    s15ResetIds = d.s15ResetIds;
   }
 
   // ── attempt display ──

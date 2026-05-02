@@ -1902,6 +1902,9 @@ function checkS14() {
 // Station metadata
 // type: 'exercise' = bewertet | 'media' = Audio/Video/Text (immer Verstanden, 1 Versuch)
 // points: Punkte bei korrekter Lösung (S8 hat 5 pro Satz = 30)
+// Tracks which stations were reset via s15-overview, so the reset arrow shows red
+var s15ResetIds = {};
+
 var s15Stations = [
   { id: "s1",  label: "Zeitreise ins alte Rom",              type: "media",    points: 1  },
   { id: "s2",  label: "Willkommen im alten Rom!",            type: "exercise", points: 5  },
@@ -2152,7 +2155,7 @@ function showS15Overview() {
         : '<span class="s15-row-pts"></span>';
 
       var resetBtn = (st.type !== "media")
-        ? '<button class="s15-row-reset" title="Aufgabe zurücksetzen" aria-label="Aufgabe zurücksetzen">↺</button>'
+        ? '<button class="s15-row-reset' + (s15ResetIds[st.id] ? ' s15-row-reset--was-reset' : '') + '" title="Aufgabe zurücksetzen" aria-label="Aufgabe zurücksetzen">↺</button>'
         : '<span class="s15-row-reset-placeholder"></span>';
 
       row.innerHTML =
@@ -2276,6 +2279,7 @@ function s15DoReset(id) {
   s15ResetFeedback(id);
   s15ResetNavBtn(id);
   s15ResetWeiterBtn(id);
+  s15ResetIds[id] = true; // mark as reset so the arrow shows red in the overview
 
   // After resetting, update the overview medal card to pending state
   // (runs after this function completes, in case s15 is currently shown)

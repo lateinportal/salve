@@ -3669,6 +3669,16 @@ body {
 .s15-row-reset:active {
   transform: rotate(-60deg) scale(0.95);
 }
+.s15-row-reset--was-reset {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+.s15-row-reset--was-reset:hover {
+  background: #fecaca;
+  color: #b91c1c;
+  border-color: #f87171;
+}
 .s15-row-reset-placeholder {
   width: 26px;
   height: 26px;

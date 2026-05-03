@@ -2273,6 +2273,45 @@ function s15ResetWeiterBtn(id) {
   if (next) next.style.display = "none";
 }
 
+// ── Update a single row in the s15 task list immediately ─────
+function s15UpdateRow(id) {
+  var list = document.getElementById("s15-task-list");
+  if (!list) return;
+  var idx = s15Stations.findIndex(function(s) { return s.id === id; });
+  if (idx === -1) return;
+  var st = s15Stations[idx];
+  var row = list.children[idx];
+  if (!row) return;
+
+  var res = s15GetStationResult(st.id);
+  var att = s15GetAttempts(st.id);
+  var earnedPts = s15GetEarnedPoints(st.id, st);
+
+  // Update tries span
+  var triesSpan = row.querySelector(".s15-row-tries");
+  if (triesSpan) triesSpan.textContent = (att > 1) ? att + " Versuche" : "";
+
+  // Update points span
+  var ptsSpan = row.querySelector(".s15-row-pts");
+  if (ptsSpan) {
+    ptsSpan.className = "s15-row-pts s15-row-pts-pending";
+    ptsSpan.innerHTML = "–&thinsp;/&thinsp;" + st.points + " Pkt.";
+  }
+
+  // Update status icon span
+  var iconSpan = row.querySelector(".s15-row-icon");
+  if (iconSpan) {
+    iconSpan.className = "s15-row-icon s15-row-icon-pending";
+    iconSpan.textContent = "–";
+  }
+
+  // Update reset button: mark as was-reset (red)
+  var resetBtn = row.querySelector(".s15-row-reset");
+  if (resetBtn) {
+    resetBtn.classList.add("s15-row-reset--was-reset");
+  }
+}
+
 // ── Per-station reset logic ───────────────────────────────────
 function s15DoReset(id) {
   hideSolutionPopover();
@@ -2280,6 +2319,9 @@ function s15DoReset(id) {
   s15ResetNavBtn(id);
   s15ResetWeiterBtn(id);
   s15ResetIds[id] = true; // mark as reset so the arrow shows red in the overview
+
+  // Immediately update the row in the overview (reset btn red, score → –)
+  s15UpdateRow(id);
 
   // After resetting, update the overview medal card to pending state
   // (runs after this function completes, in case s15 is currently shown)

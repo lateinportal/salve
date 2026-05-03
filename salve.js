@@ -2320,9 +2320,6 @@ function s15DoReset(id) {
   s15ResetWeiterBtn(id);
   s15ResetIds[id] = true; // mark as reset so the arrow shows red in the overview
 
-  // Immediately update the row in the overview (reset btn red, score → –)
-  s15UpdateRow(id);
-
   // After resetting, update the overview medal card to pending state
   // (runs after this function completes, in case s15 is currently shown)
   setTimeout(function() { s15UpdateMedalPending(); }, 0);
@@ -2352,6 +2349,7 @@ function s15DoReset(id) {
       c.style.cursor = "";
       c.style.opacity = "";
     });
+    s15UpdateRow(id);
     return;
   }
 
@@ -2370,6 +2368,7 @@ function s15DoReset(id) {
       var fresh = inp.cloneNode(true);
       inp.parentNode.replaceChild(fresh, inp);
     });
+    s15UpdateRow(id);
     return;
   }
 
@@ -2387,6 +2386,7 @@ function s15DoReset(id) {
       var fresh = inp.cloneNode(true);
       inp.parentNode.replaceChild(fresh, inp);
     });
+    s15UpdateRow(id);
     return;
   }
 
@@ -2412,6 +2412,7 @@ function s15DoReset(id) {
     });
     var rst = document.getElementById("reset-s10");
     if (rst) rst.disabled = false;
+    s15UpdateRow(id);
     return;
   }
 
@@ -2450,6 +2451,7 @@ function s15DoReset(id) {
     });
     var lbl = document.getElementById("s11-picker-label");
     if (lbl) lbl.textContent = "Subjekt";
+    s15UpdateRow(id);
     return;
   }
 
@@ -2478,6 +2480,7 @@ function s15DoReset(id) {
       c.style.cursor = "";
       c.style.opacity = "";
     });
+    s15UpdateRow(id);
     return;
   }
 
@@ -2501,6 +2504,7 @@ function s15DoReset(id) {
     });
     var hint = document.getElementById("hint-s13");
     if (hint) hint.style.display = "none";
+    s15UpdateRow(id);
     return;
   }
 
@@ -2529,6 +2533,7 @@ function s15DoReset(id) {
       c.style.cursor = "";
       c.style.opacity = "";
     });
+    s15UpdateRow(id);
     return;
   }
 }

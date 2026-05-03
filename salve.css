@@ -3883,10 +3883,10 @@ body {
   height: 0;
   border-top: 9px solid transparent;
   border-bottom: 9px solid transparent;
-  border-right: 14px solid #ef4444;
+  border-left: 14px solid #ef4444;
   filter: drop-shadow(0 1px 3px rgba(239,68,68,0.5));
 }
 @keyframes resetArrowBounce {
   from { transform: translateX(0px); }
-  to   { transform: translateX(-8px); }
+  to   { transform: translateX(8px); }
 }

@@ -3063,7 +3063,7 @@ function showResetArrow(id) {
     if (!_resetArrowEl || !navBtn) return;
     var rect = navBtn.getBoundingClientRect();
     // Position to the right side of the nav button, vertically centered
-    var left = rect.right + 10;
+    var left = rect.left - 10 - 14; // 14 = arrow width
     var top  = rect.top + rect.height / 2 - 9; // 9 = half arrow height
     _resetArrowEl.style.left = left + "px";
     _resetArrowEl.style.top  = top + "px";

@@ -29,6 +29,8 @@ function showSection(id) {
   document.getElementById(id).classList.add("active");
   document.getElementById("nav-" + id).classList.add("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
+  // If user navigates to the reset task, hide the arrow nudge
+  if (_resetArrowId === id) hideResetArrow(false);
 }
 
 // ── Attempt / Feedback helpers ───────────────────────────────
@@ -40,6 +42,8 @@ function attempt(key) {
   tries[key]++;
   var el = document.getElementById("att-" + key);
   if (el) el.textContent = "Versuche: " + tries[key] + " / " + MAX;
+  // Check if reset arrow should hide (3 new attempts reached)
+  checkResetArrowState(key);
   return tries[key];
 }
 
@@ -91,10 +95,14 @@ function markNav(id, ok) {
     btn.classList.remove("done-fail");
     btn.classList.add("done-ok");
     badge.textContent = "✓";
+    // Task completed: hide the reset arrow if it was showing for this task
+    if (_resetArrowId === id) hideResetArrow(false);
   } else {
     btn.classList.remove("done-ok");
     btn.classList.add("done-fail");
     badge.textContent = "!";
+    // Failed (3rd attempt exhausted again): hide arrow after 3 new tries
+    checkResetArrowState(id);
   }
   btn.appendChild(badge);
 }
@@ -2324,6 +2332,9 @@ function s15DoReset(id) {
   // (runs after this function completes, in case s15 is currently shown)
   setTimeout(function() { s15UpdateMedalPending(); }, 0);
 
+  // Show bouncing red arrow pointing at the nav button for this task
+  setTimeout(function() { showResetArrow(id); }, 50);
+
   // ── S2: Drag & Drop Lückentext ──
   if (id === "s2") {
     s2Tries = 0;
@@ -3019,6 +3030,86 @@ function salveRestore() {
         slot.style.cursor = "pointer";
       }
     });
+  }
+}
+
+// ── Reset Arrow ──────────────────────────────────────────────
+// Shows a bouncing red arrow to the right of the nav button for a reset task.
+// Disappears when: (a) task is marked done-ok, (b) tries reach MAX again,
+//                  (c) user navigates to that section.
+var _resetArrowEl = null;
+var _resetArrowId = null;
+var _resetArrowTriesSnapshot = 0;
+
+function showResetArrow(id) {
+  // Remove existing arrow first
+  hideResetArrow(true);
+
+  var navBtn = document.getElementById("nav-" + id);
+  if (!navBtn) return;
+
+  // Create arrow element
+  var arrow = document.createElement("div");
+  arrow.className = "reset-arrow";
+  arrow.id = "reset-arrow-el";
+  arrow.innerHTML = '<div class="reset-arrow-icon"></div>';
+  document.body.appendChild(arrow);
+
+  _resetArrowEl = arrow;
+  _resetArrowId = id;
+  _resetArrowTriesSnapshot = tries[id] || 0;
+
+  function positionArrow() {
+    if (!_resetArrowEl || !navBtn) return;
+    var rect = navBtn.getBoundingClientRect();
+    // Position to the right side of the nav button, vertically centered
+    var left = rect.right + 10;
+    var top  = rect.top + rect.height / 2 - 9; // 9 = half arrow height
+    _resetArrowEl.style.left = left + "px";
+    _resetArrowEl.style.top  = top + "px";
+  }
+
+  positionArrow();
+
+  // Reposition on scroll / resize
+  function onReposition() { positionArrow(); }
+  window.addEventListener("scroll", onReposition, true);
+  window.addEventListener("resize", onReposition);
+  _resetArrowEl._cleanup = function() {
+    window.removeEventListener("scroll", onReposition, true);
+    window.removeEventListener("resize", onReposition);
+  };
+}
+
+function hideResetArrow(immediate) {
+  if (!_resetArrowEl) return;
+  var el = _resetArrowEl;
+  _resetArrowEl = null;
+  _resetArrowId = null;
+  if (el._cleanup) el._cleanup();
+  if (immediate) {
+    if (el.parentNode) el.parentNode.removeChild(el);
+  } else {
+    el.classList.add("hidden");
+    setTimeout(function() {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 450);
+  }
+}
+
+// Check after each attempt / nav event whether to hide the arrow
+function checkResetArrowState(id) {
+  if (!_resetArrowEl || _resetArrowId !== id) return;
+  var navBtn = document.getElementById("nav-" + id);
+  // Hide if task is now marked done-ok (success)
+  if (navBtn && navBtn.classList.contains("done-ok")) {
+    hideResetArrow(false);
+    return;
+  }
+  // Hide after 3 new attempts since the reset (tries reached MAX again)
+  var currentTries = tries[id] || 0;
+  if (currentTries - _resetArrowTriesSnapshot >= MAX) {
+    hideResetArrow(false);
   }
 }
 

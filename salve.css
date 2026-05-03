@@ -3863,3 +3863,30 @@ body {
   font-style: italic;
   margin-top: 8px;
 }
+
+/* ── Reset-Arrow: bouncing red arrow beside the nav sidebar ── */
+.reset-arrow {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  z-index: 999;
+  pointer-events: none;
+  animation: resetArrowBounce 0.7s ease-in-out infinite alternate;
+  transition: opacity 0.4s;
+}
+.reset-arrow.hidden {
+  opacity: 0;
+}
+.reset-arrow-icon {
+  width: 0;
+  height: 0;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-right: 14px solid #ef4444;
+  filter: drop-shadow(0 1px 3px rgba(239,68,68,0.5));
+}
+@keyframes resetArrowBounce {
+  from { transform: translateX(0px); }
+  to   { transform: translateX(-8px); }
+}

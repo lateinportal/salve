@@ -496,7 +496,7 @@ function checkS2() {
     s2Locked = true;
     fb.className = "feedback show err";
     fb.textContent =
-      "Leider nicht geschafft. Klicke auf ein gelbes Feld um die richtige Antwort einzublenden.";
+      "Du hast Fehler gemacht. Schau dir die Lösung an.";
     btn.disabled = true;
     if (next) next.style.display = "inline-block";
     markNav("s2", false);

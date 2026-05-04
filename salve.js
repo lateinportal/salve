@@ -2256,6 +2256,13 @@ function showS15Overview() {
     });
   }
 
+  // Fix 3: Re-apply comment button highlight for any saved comments
+  // (must run AFTER task list is rendered above)
+  Object.keys(s15Comments).forEach(function(stId) {
+    var text = s15Comments[stId];
+    if (text) s15UpdateCommentBtn(stId, text);
+  });
+
   // Navigate to S15
   _showSectionRaw("s15");
 
@@ -3336,6 +3343,23 @@ function salveRestore() {
       }
     });
   }
+
+  // Fix 2: Re-show reset arrows for all tasks that were reset before the refresh
+  if (d.s15ResetIds) {
+    // defer so nav buttons are already restored when we position the arrows
+    setTimeout(function() {
+      Object.keys(d.s15ResetIds).forEach(function(id) {
+        if (!d.s15ResetIds[id]) return;
+        // Only show arrow if the task is NOT done-ok (it was completed after reset)
+        var navBtn = document.getElementById("nav-" + id);
+        if (navBtn && navBtn.classList.contains("done-ok")) return;
+        // Only show if fewer than MAX new attempts have been used since the reset
+        // We approximate: if the task has done-fail, attempts were exhausted -> no arrow
+        if (navBtn && navBtn.classList.contains("done-fail")) return;
+        showResetArrow(id);
+      });
+    }, 50);
+  }
 }
 
 // ── Reset Arrow ──────────────────────────────────────────────
@@ -3430,7 +3454,8 @@ function checkResetArrowState(id) {
    "markNav","markNavPending","markS1Weiter","markS3Weiter","markS5Weiter",
    "markS6Weiter","markS7Weiter","markS9Weiter","s15DoReset",
    "s2PlaceChip","s2ReturnChip","s12PlaceChip","s12ReturnChip",
-   "s14PlaceChip","s14ReturnChip"
+   "s14PlaceChip","s14ReturnChip",
+   "showSection","_showSectionRaw","showS15Overview"
   ].forEach(wrap);
 
   // Also save on token clicks (S10, S11) and S13 item clicks

@@ -236,12 +236,51 @@ function markS1Weiter() {
   markNav("s1", true);
   var btn = document.getElementById("btn-s1-weiter");
   if (btn) btn.disabled = true;
-  showSection("s2");
+  var undone = _nextUndoneAfter("s1");
+  if (undone === null) showS15Overview(); else showSection(undone);
 }
 
 // ── Weiter-Button helper ─────────────────────────────────────
+
+// Returns the id of the next undone exercise/section after `afterId`,
+// or null if all are done (→ go to s15 overview).
+function _nextUndoneAfter(afterId) {
+  var order = ["s1","s2","s3","s4","s5","s6","s7","s8","s9","s10","s11","s12","s13","s14"];
+  var startIdx = order.indexOf(afterId);
+  // Search from the section AFTER afterId through the end, then wrap around
+  // from the beginning up to (but not including) afterId.
+  var search = order.slice(startIdx + 1).concat(order.slice(0, startIdx + 1));
+  for (var i = 0; i < search.length; i++) {
+    var id = search[i];
+    var btn = document.getElementById("nav-" + id);
+    if (!btn) continue;
+    // Undone = neither done-ok nor done-fail nor done-pending
+    if (!btn.classList.contains("done-ok") &&
+        !btn.classList.contains("done-fail") &&
+        !btn.classList.contains("done-pending")) {
+      return id;
+    }
+  }
+  return null; // all done
+}
+
 function weiterTo(nextId) {
-  showSection(nextId);
+  // Find the first undone section (searching forward from nextId's predecessor)
+  // The caller passes the *intended* next section. We treat the current
+  // section as the one just before nextId.
+  var order = ["s1","s2","s3","s4","s5","s6","s7","s8","s9","s10","s11","s12","s13","s14"];
+  var nextIdx = order.indexOf(nextId);
+  var prevId = nextIdx > 0 ? order[nextIdx - 1] : order[0];
+  // If nextId is s15 (or not in order), treat current section as s14
+  if (nextIdx === -1) prevId = "s14";
+
+  var undone = _nextUndoneAfter(prevId);
+  if (undone === null) {
+    // All sections done → show overview
+    showS15Overview();
+  } else {
+    showSection(undone);
+  }
 }
 
 // ── Nav button click wiring ───────────────────────────────────
@@ -604,7 +643,8 @@ document.addEventListener("click", function (e) {
 function markS3Weiter() {
   markNav("s3", true);
   document.getElementById("btn-s3-weiter").disabled = true;
-  showSection("s4");
+  var undone = _nextUndoneAfter("s3");
+  if (undone === null) showS15Overview(); else showSection(undone);
 }
 
 // ═══════════════════════════════════════════════════
@@ -743,7 +783,8 @@ function unlockS5Weiter() {
 function markS5Weiter() {
   markNav("s5", true);
   document.getElementById("btn-s5-weiter").disabled = true;
-  showSection("s6");
+  var undone = _nextUndoneAfter("s5");
+  if (undone === null) showS15Overview(); else showSection(undone);
 }
 
 // ═══════════════════════════════════════════════════
@@ -834,21 +875,24 @@ function checkS8() {
 function markS6Weiter() {
   markNav("s6", true);
   document.getElementById("btn-s6-weiter").disabled = true;
-  showSection("s7");
+  var undone = _nextUndoneAfter("s6");
+  if (undone === null) showS15Overview(); else showSection(undone);
 }
 
 // ── S7: G3 Verstecktes Subjekt ───────────────────────────────
 function markS7Weiter() {
   markNav("s7", true);
   document.getElementById("btn-s7-weiter").disabled = true;
-  showSection("s8");
+  var undone = _nextUndoneAfter("s7");
+  if (undone === null) showS15Overview(); else showSection(undone);
 }
 
 // ── S9: G4 Prädikatsnomen ────────────────────────────────────
 function markS9Weiter() {
   markNav("s9", true);
   document.getElementById("btn-s9-weiter").disabled = true;
-  showSection("s10");
+  var undone = _nextUndoneAfter("s9");
+  if (undone === null) showS15Overview(); else showSection(undone);
 }
 
 // ═══════════════════════════════════════════════════

@@ -3715,6 +3715,42 @@ body {
   display: inline-block;
 }
 
+/* Actions group: reset + comment side by side */
+.s15-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+/* Comment button – same style as reset button */
+.s15-row-comment {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #9ca3af;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.1s;
+  padding: 0;
+  flex-shrink: 0;
+}
+.s15-row-comment:hover {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #93c5fd;
+  transform: scale(1.1);
+}
+.s15-row-comment:active {
+  transform: scale(0.95);
+}
+
 
 
 /* ── Next lesson button ── */

@@ -2218,13 +2218,18 @@ function showS15Overview() {
         ? '<button class="s15-row-reset' + (s15ResetIds[st.id] ? ' s15-row-reset--was-reset' : '') + '" title="Aufgabe zurücksetzen" aria-label="Aufgabe zurücksetzen">↺</button>'
         : '<span class="s15-row-reset-placeholder"></span>';
 
+      var commentBtn = '<button class="s15-row-comment" title="Kommentar hinzufügen" aria-label="Kommentar hinzufügen">' +
+        '<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" xmlns="http://www.w3.org/2000/svg">' +
+        '<path d="M2 3.5A1.5 1.5 0 0 1 3.5 2h13A1.5 1.5 0 0 1 18 3.5v9A1.5 1.5 0 0 1 16.5 14H11l-3 3v-3H3.5A1.5 1.5 0 0 1 2 12.5v-9z"/>' +
+        '</svg></button>';
+
       row.innerHTML =
         '<span class="s15-row-num">' + (idx + 1) + '</span>' +
         '<span class="s15-row-label">' + st.label + '</span>' +
         '<span class="s15-row-tries">' + triesStr + '</span>' +
         ptsStr +
         '<span class="s15-row-icon ' + iconClass + '">' + icon + '</span>' +
-        resetBtn;
+        '<span class="s15-row-actions">' + resetBtn + commentBtn + '</span>';
 
       (function(stId){
         row.addEventListener("click", function(){ showSection(stId); });
@@ -2236,6 +2241,13 @@ function showS15Overview() {
           btn.addEventListener("click", function(e){
             e.stopPropagation();
             s15ResetStation(stId);
+          });
+        }
+        var cmtBtn = row.querySelector(".s15-row-comment");
+        if (cmtBtn) {
+          cmtBtn.addEventListener("click", function(e){
+            e.stopPropagation();
+            // Placeholder: Kommentar-Funktion folgt
           });
         }
       })(st.id);

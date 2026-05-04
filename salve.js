@@ -3228,23 +3228,82 @@ function salveRestore() {
   }
 
   // ── S10 tokens ──
-  if (d.s10Marked && d.s10Marked.length) {
-    document.querySelectorAll("#mk-s10 .mk-token").forEach(function(el) {
-      var id = parseInt(el.dataset.id);
-      if (d.s10Marked.indexOf(id) !== -1) el.classList.add("mk--marked");
-    });
+  if (d.s10Marked) {
+    if (d.s10Locked) {
+      // Re-evaluate and apply locked visual states (correct/missed/incorrect-marked)
+      var s10Results = s10Data.tokens.map(function(tok) {
+        var isMarked = d.s10Marked.indexOf(tok.id) !== -1;
+        var state;
+        if (isMarked && tok.correct) state = "correct";
+        else if (isMarked && !tok.correct) state = "incorrect";
+        else if (!isMarked && tok.correct) state = "missed";
+        else state = "neutral";
+        return { id: tok.id, state: state };
+      });
+      s10Results.forEach(function(r) {
+        var el = document.querySelector("#mk-s10 .mk-token[data-id='" + r.id + "']");
+        if (!el) return;
+        el.classList.remove("mk--marked","mk--correct","mk--incorrect","mk--incorrect-marked","mk--missed","mk--neutral");
+        if (r.state === "correct") {
+          el.classList.add("mk--correct");
+        } else if (r.state === "incorrect") {
+          el.classList.add("mk--incorrect-marked");
+          el.dataset.solutionTrigger = "1";
+          el.addEventListener("click", function() {
+            showSolutionPopover(el, "Löschen", true);
+          });
+        } else if (r.state === "missed") {
+          el.classList.add("mk--missed");
+          el.dataset.solutionTrigger = "1";
+          el.addEventListener("click", function() {
+            showSolutionPopover(el, "Prädikatsnomen", true);
+          });
+        }
+      });
+    } else if (d.s10Marked.length) {
+      document.querySelectorAll("#mk-s10 .mk-token").forEach(function(el) {
+        var id = parseInt(el.dataset.id);
+        if (d.s10Marked.indexOf(id) !== -1) el.classList.add("mk--marked");
+      });
+    }
   }
 
   // ── S11 tokens ──
   if (d.s11TokenState) {
-    document.querySelectorAll("#mk-s11 .s11-token").forEach(function(el) {
-      var id = el.dataset.id;
-      var marker = d.s11TokenState[id];
-      if (marker) {
-        el.classList.remove("marked-subjekt", "marked-praedikat", "marked-versteckt");
-        el.classList.add("marked-" + marker);
-      }
-    });
+    if (d.s11Locked) {
+      // Re-evaluate and apply locked visual states
+      var s11MarkerLabels = {
+        subjekt: "Subjekt",
+        praedikat: "Prädikat",
+        versteckt: "Prädikat mit verstecktem Subjekt",
+      };
+      document.querySelectorAll("#mk-s11 .s11-token").forEach(function(el) {
+        var id = el.dataset.id;
+        var expected = el.dataset.correct;
+        var given    = d.s11TokenState[id] || null;
+        var isOk     = given === expected;
+        el.classList.remove("marked-subjekt","marked-praedikat","marked-versteckt","s11-correct","s11-wrong");
+        if (isOk) {
+          el.classList.add("s11-correct");
+        } else {
+          el.classList.add("s11-wrong");
+          el.dataset.solutionTrigger = "1";
+          var hint = s11MarkerLabels[expected] || expected;
+          el.addEventListener("click", function() {
+            showSolutionPopover(el, hint, true);
+          });
+        }
+      });
+    } else {
+      document.querySelectorAll("#mk-s11 .s11-token").forEach(function(el) {
+        var id = el.dataset.id;
+        var marker = d.s11TokenState[id];
+        if (marker) {
+          el.classList.remove("marked-subjekt", "marked-praedikat", "marked-versteckt");
+          el.classList.add("marked-" + marker);
+        }
+      });
+    }
     // Restore picker state
     ["subjekt", "praedikat", "versteckt"].forEach(function(t) {
       var btn = document.getElementById("s11-m-" + t);
@@ -3283,55 +3342,52 @@ function salveRestore() {
   // These are already saved via the slot's className implicitly through
   // the DOM, but we need to re-apply ok/wrong on slots for locked exercises.
   // For drag-drop locked states: re-run a visual-only check pass.
-  function reapplyDragDropClasses(slotsData, correctMap, locked) {
-    if (!locked || !slotsData) return;
-    Object.keys(slotsData).forEach(function(slotId) {
+  function reapplyDragDropClasses(slotsData, correctMap, locked, solutionDataAttr) {
+    if (!locked) return;
+    // Iterate over ALL slots in correctMap (covers both filled and empty slots)
+    Object.keys(correctMap).forEach(function(slotId) {
       var slot   = document.getElementById(slotId);
       if (!slot) return;
-      var chipId = slotsData[slotId];
-      var isOk   = (chipId === correctMap[slotId]);
+      var chipId = slotsData ? (slotsData[slotId] || null) : null;
+      var isOk   = chipId && (chipId === correctMap[slotId]);
       slot.classList.remove("ok", "wrong");
       slot.classList.add(isOk ? "ok" : "wrong");
-      if (!isOk) slot.dataset.solutionTrigger = "1";
+      if (!isOk) {
+        slot.dataset.solutionTrigger = "1";
+        // For S12: set dataset.solution (the correct chip's text)
+        if (solutionDataAttr) {
+          var correctChip = document.getElementById(correctMap[slotId]);
+          slot.dataset.solution = correctChip ? correctChip.textContent.trim() : "?";
+          slot.style.cursor = "pointer";
+        }
+      }
     });
   }
-  reapplyDragDropClasses(d.s2Slots,  s2CorrectMap,  d.s2Locked);
-  reapplyDragDropClasses(d.s12Slots, s12CorrectMap, d.s12Locked);
+  reapplyDragDropClasses(d.s2Slots,  s2CorrectMap,  d.s2Locked,  false);
+  reapplyDragDropClasses(d.s12Slots, s12CorrectMap, d.s12Locked, true);
 
   // ── Rebuild s2Wrong after restore so popovers work ──
-  if (d.s2Locked && d.s2Slots) {
+  if (d.s2Locked) {
     s2Wrong = {};
-    Object.keys(d.s2Slots).forEach(function(slotId) {
-      var slot   = document.getElementById(slotId);
-      if (!slot || !slot.classList.contains("wrong")) return;
-      var expectedChipId = s2CorrectMap[slotId];
-      var correctChip    = document.getElementById(expectedChipId);
-      s2Wrong[slotId] = {
-        el:      slot,
-        correct: correctChip ? correctChip.textContent : "?"
-      };
-    });
-    // Also handle slots that were empty (no chip placed) when locked
     Object.keys(s2CorrectMap).forEach(function(slotId) {
-      if (s2Wrong[slotId]) return; // already handled above
       var slot = document.getElementById(slotId);
       if (!slot || !slot.classList.contains("wrong")) return;
       var expectedChipId = s2CorrectMap[slotId];
       var correctChip    = document.getElementById(expectedChipId);
       s2Wrong[slotId] = {
         el:      slot,
-        correct: correctChip ? correctChip.textContent : "?"
+        correct: correctChip ? correctChip.textContent.trim() : "?"
       };
     });
   }
 
   // S14: category-based correctness
-  if (d.s14Locked && d.s14Slots) {
-    Object.keys(d.s14Slots).forEach(function(slotId) {
-      var slot   = document.getElementById(slotId);
-      if (!slot) return;
-      var chipId    = d.s14Slots[slotId];
-      var placedCat = s14CategoryMap[chipId] || null;
+  if (d.s14Locked) {
+    // Iterate ALL s14 slots (including empty ones)
+    document.querySelectorAll(".s14-slot").forEach(function(slot) {
+      var slotId    = slot.id;
+      var chipId    = (d.s14Slots && d.s14Slots[slotId]) || null;
+      var placedCat = chipId ? (s14CategoryMap[chipId] || null) : null;
       var correctCat = s14CorrectCategory(slotId);
       var isOk = placedCat && placedCat === correctCat;
       slot.classList.remove("ok", "wrong");

@@ -517,7 +517,7 @@ function checkS2() {
 
   if (correct === total) {
     fb.className = "feedback show ok";
-    fb.textContent = "Richtig! Alle " + total + " Zuordnungen korrekt.";
+    fb.textContent = "Alles richtig!";
     btn.disabled = true;
     if (next) next.style.display = "inline-block";
     markNav("s2", true);
@@ -699,7 +699,7 @@ function checkS4() {
 
   if (correct === total) {
     fb.className = "feedback show ok";
-    fb.textContent = "Richtig! Alle " + total + " Bedeutungen korrekt.";
+    fb.textContent = "Alles richtig!";
     btn.disabled = true;
     s4Locked = true;
     if (next) next.style.display = "inline-block";
@@ -839,7 +839,7 @@ function checkS8() {
 
   if (correct === total) {
     fb.className = "feedback show ok";
-    fb.textContent = "Richtig! Alle " + total + " Übersetzungen korrekt.";
+    fb.textContent = "Alles richtig!";
     btn.disabled = true;
     s8Locked = true;
     if (next) next.style.display = "inline-block";
@@ -1009,8 +1009,7 @@ function checkS10() {
   if (allPerfect) {
     _applyTokenStates(results);
     fb.className = "feedback show ok";
-    fb.textContent =
-      "Richtig! Alle " + totalPoints + " Prädikatsnomen korrekt markiert.";
+    fb.textContent = "Alles richtig!";
     btn.disabled = true;
     if (rst) rst.disabled = true;
     s10Locked = true;
@@ -1179,7 +1178,7 @@ function checkS11() {
   if (allPerfect) {
     tokens.forEach(function (el) { el.classList.add("s11-correct"); });
     fb.className = "feedback show ok";
-    fb.textContent = "Richtig! Alle Satzglieder korrekt bestimmt.";
+    fb.textContent = "Alles richtig!";
     btn.disabled = true;
     s11Locked = true;
     if (next) next.style.display = "inline-block";
@@ -1438,8 +1437,7 @@ function checkS13() {
     document.getElementById("btn-s13").disabled = true;
     if (next) next.style.display = "inline-block";
     fb.className = "feedback show ok";
-    fb.textContent =
-      "Richtig! Alle " + s13Data.length + " Begriffe korrekt zugeordnet.";
+    fb.textContent = "Alles richtig!";
     markNav("s13", true);
   } else if (locked) {
     s13Data.forEach(function (d) {
@@ -1678,7 +1676,7 @@ function checkS12() {
 
   if (correct === total) {
     fb.className = "feedback show ok";
-    fb.textContent = "Richtig! Alle " + total + " Zuordnungen korrekt.";
+    fb.textContent = "Alles richtig!";
     btn.disabled = true;
     s12Locked = true;
     document.querySelectorAll("#s12-pool .s15-chip").forEach(function (c) {
@@ -1924,7 +1922,7 @@ function checkS14() {
 
   if (correct === total) {
     fb.className = "feedback show ok";
-    fb.textContent = "Richtig! Alle " + total + " Felder korrekt ausgefüllt.";
+    fb.textContent = "Alles richtig!";
     btn.disabled = true;
     s14Locked = true;
     document.querySelectorAll("#s14-pool .s15-chip").forEach(function (c) {

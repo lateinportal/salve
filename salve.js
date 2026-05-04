@@ -1011,8 +1011,7 @@ function checkS10() {
     });
 
     fb.className = "feedback show err";
-    fb.innerHTML =
-      "Du hast Fehler gemacht. Schau dir die Lösung an und lies dir <a href='#' onclick=\"showSection('s9'); return false;\" style='color:inherit;font-weight:700;text-decoration:underline;'>G4 Prädikatsnomen</a> durch.";
+    fb.textContent = "Du hast Fehler gemacht. Schau dir die Lösung an.";
     if (next) next.style.display = "inline-block";
     markNav("s10", false);
   }
@@ -1170,11 +1169,7 @@ function checkS11() {
     });
 
     fb.className = "feedback show err";
-    fb.textContent =
-      earnedPoints +
-      " von " +
-      totalPoints +
-      " Sätzen richtig. Klicke auf ein gelbes Wort für einen Hinweis.";
+    fb.textContent = "Du hast Fehler gemacht. Schau dir die Lösung an.";
     if (next) next.style.display = "inline-block";
     markNav("s11", false);
   }
@@ -1419,8 +1414,7 @@ function checkS13() {
     document.getElementById("hint-s13").style.display = "block";
     if (next) next.style.display = "inline-block";
     fb.className = "feedback show err";
-    fb.textContent =
-      "Leider nicht geschafft. Klicke auf einen Kreis um die zugehörigen Begriffe anzuzeigen.";
+    fb.textContent = "Du hast Fehler gemacht. Schau dir die Lösung an.";
     markNav("s13", false);
   } else {
     fb.className = "feedback show warn";
@@ -1660,8 +1654,7 @@ function checkS12() {
       c.style.cursor = "default";
     });
     fb.className = "feedback show err";
-    fb.textContent =
-      "Leider nicht geschafft. Klicke auf ein gelbes Feld um die richtige Antwort einzublenden.";
+    fb.textContent = "Du hast Fehler gemacht. Schau dir die Lösung an.";
     if (next) next.style.display = "inline-block";
     markNav("s12", false);
     // Attach popover to wrong slots
@@ -1907,8 +1900,7 @@ function checkS14() {
       c.style.cursor = "default";
     });
     fb.className = "feedback show err";
-    fb.textContent =
-      "Leider nicht geschafft. Klicke auf ein gelbes Feld um die richtige Antwort einzublenden.";
+    fb.textContent = "Du hast Fehler gemacht. Schau dir die Lösung an.";
     if (next) next.style.display = "inline-block";
     markNav("s14", false);
 

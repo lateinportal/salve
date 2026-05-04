@@ -3504,6 +3504,24 @@ body {
   pointer-events: none;
   z-index: 1;
 }
+/* Gold medal above the threshold marker */
+.s15-progress-wrap::after {
+  content: '🥇';
+  position: absolute;
+  left: 85%;
+  top: -32px;
+  transform: translateX(-50%);
+  font-size: 20px;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.18));
+  animation: medal-bob 2.4s ease-in-out infinite;
+}
+@keyframes medal-bob {
+  0%, 100% { transform: translateX(-50%) translateY(0px); }
+  50%       { transform: translateX(-50%) translateY(-3px); }
+}
 .s15-progress-fill {
   height: 100%;
   border-radius: 999px;

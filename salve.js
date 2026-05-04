@@ -2129,10 +2129,10 @@ function showS15Overview() {
     medal = "🥉"; medalClass = "s15-bronze";  barColor = "#cd7f32"; scoreText = "Weiter so – noch Luft nach oben.";
     gradeNum = 3; gradeText = "befriedigend";  gradeChipClass = "s15-chip-grade-3";
   } else if (pct >= 45) {
-    medal = "😐"; medalClass = "s15-passed";  barColor = "#6b7280"; scoreText = "Da geht noch mehr.";
+    medal = "🤔"; medalClass = "s15-passed";  barColor = "#6b7280"; scoreText = "Da geht noch mehr.";
     gradeNum = 4; gradeText = "ausreichend";   gradeChipClass = "s15-chip-grade-4";
   } else {
-    medal = "😭"; medalClass = "s15-failed";  barColor = "#ef4444"; scoreText = "Das üben wir nochmal.";
+    medal = "🧐"; medalClass = "s15-failed";  barColor = "#ef4444"; scoreText = "Das üben wir nochmal.";
     gradeNum = 5; gradeText = "mangelhaft";    gradeChipClass = "s15-chip-grade-5";
   }
 

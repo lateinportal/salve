@@ -2514,8 +2514,7 @@ function s15ParseMarkdown(text) {
   escaped = escaped.replace(/\*(.+?)\*/g, "<em>$1</em>");
 
   // Line breaks
-  escaped = escaped.replace(/
-/g, "<br>");
+  escaped = escaped.replace(/\n/g, "<br>");
 
   return escaped;
 }

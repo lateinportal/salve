@@ -667,6 +667,31 @@ function checkS4() {
   } else if (s4Tries < 3) {
     fb.className = "feedback show warn";
     fb.textContent = "Das ist noch nicht richtig.";
+
+    // Prüfen: Gibt es Fehler, die nur an Groß-/Kleinschreibung liegen?
+    var hasCapitalisationError = s4Inputs.some(function (key) {
+      var inp = document.getElementById("s4-in-" + key);
+      if (!inp || inp.classList.contains("ok")) return false;
+      var val = inp.value.trim();
+      var answers = inp.dataset.answers.split(",").map(function (a) { return a.trim(); });
+      // Falsch, aber case-insensitiv korrekt?
+      return answers.some(function (a) {
+        return a.toLowerCase() === val.toLowerCase() && a !== val;
+      });
+    });
+
+    var fbCase = document.getElementById("fb-s4-case");
+    if (hasCapitalisationError) {
+      if (!fbCase) {
+        fbCase = document.createElement("div");
+        fbCase.id = "fb-s4-case";
+        fb.parentNode.insertBefore(fbCase, fb.nextSibling);
+      }
+      fbCase.className = "feedback show warn";
+      fbCase.textContent = "Achte auf die Rechtschreibung.";
+    } else {
+      if (fbCase) fbCase.className = "feedback";
+    }
   } else {
     // Nach 3 Versuchen: sperren + Popover auf falschen Feldern
     s4Locked = true;
@@ -2377,6 +2402,9 @@ function s15DoReset(id) {
       var fresh = inp.cloneNode(true);
       inp.parentNode.replaceChild(fresh, inp);
     });
+    // Rechtschreib-Hinweis zurücksetzen
+    var fbCase = document.getElementById("fb-s4-case");
+    if (fbCase) fbCase.className = "feedback";
     s15UpdateRow(id);
     return;
   }

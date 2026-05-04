@@ -99,7 +99,7 @@ function markNav(id, ok) {
     btn.classList.remove("done-ok");
     btn.classList.add("done-fail");
     badge.textContent = "!";
-    // Failed (3rd attempt exhausted again): hide arrow after 3 new tries
+    // Failed: hide the reset arrow (done-fail or MAX tries reached)
     checkResetArrowState(id);
   }
   btn.appendChild(badge);
@@ -3501,7 +3501,7 @@ function salveRestore() {
 // ── Reset Arrow ──────────────────────────────────────────────
 // Shows a bouncing red arrow LEFT of the nav button for each reset task.
 // Multiple arrows can be active at once (one per reset task).
-// Disappears only when: (a) task done-ok, OR (b) MAX new attempts used.
+// Disappears only when: (a) task done-ok, (b) task done-fail, OR (c) MAX new attempts used.
 // Does NOT disappear when navigating to the section.
 var _resetArrows = {}; // id → { el, triesSnapshot, cleanup }
 
@@ -3567,7 +3567,12 @@ function checkResetArrowState(id) {
     _removeResetArrow(id, false);
     return;
   }
-  // (b) MAX new attempts used since the reset
+  // (b) Task failed after exhausting all attempts (done-fail)
+  if (navBtn && navBtn.classList.contains("done-fail")) {
+    _removeResetArrow(id, false);
+    return;
+  }
+  // (c) MAX new attempts used since the reset
   var currentTries = tries[id] || 0;
   if (currentTries - entry.triesSnapshot >= MAX) {
     _removeResetArrow(id, false);

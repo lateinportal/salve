@@ -3956,9 +3956,15 @@ body {
 
 /* Comment button: has-comment state */
 .s15-row-comment--has-comment {
-  background: #eff6ff !important;
-  color: #2563eb !important;
-  border-color: #93c5fd !important;
+  background: #2563eb !important;
+  color: #fff !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 2px 6px rgba(37,99,235,.35) !important;
+}
+.s15-row-comment--has-comment:hover {
+  background: #1d4ed8 !important;
+  color: #fff !important;
+  border-color: #1e40af !important;
 }
 
 /* ── Teacher comment banner (shown above task-title in section) ── */

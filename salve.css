@@ -3987,7 +3987,17 @@ body {
   color: #78350f;
   line-height: 1.55;
   margin: 0;
-  white-space: pre-wrap;
+}
+
+.lc-comment-link {
+  color: #92400e;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-all;
+}
+.lc-comment-link:hover {
+  color: #78350f;
 }
 
 /* ── S15 Medal card: pending state after reset ── */

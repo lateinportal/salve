@@ -2491,6 +2491,35 @@ function s15OpenCommentModal(stId) {
 }
 
 // Render (or remove) a teacher comment banner above the task-title in the section
+// Minimal Markdown → safe HTML (links, bold, italic, line breaks)
+function s15ParseMarkdown(text) {
+  // Escape HTML entities first to prevent XSS
+  var escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // [label](url) → <a> — only http/https URLs allowed
+  escaped = escaped.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,
+    function(_, label, url) {
+      return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" class="lc-comment-link">' + label + '</a>';
+    }
+  );
+
+  // **bold**
+  escaped = escaped.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+
+  // *italic*
+  escaped = escaped.replace(/\*(.+?)\*/g, "<em>$1</em>");
+
+  // Line breaks
+  escaped = escaped.replace(/
+/g, "<br>");
+
+  return escaped;
+}
+
 function s15RenderCommentBanner(stId, text) {
   var section = document.getElementById(stId);
   if (!section) return;
@@ -2512,7 +2541,7 @@ function s15RenderCommentBanner(stId, text) {
 
   var body = document.createElement("p");
   body.className = "lc-teacher-comment-body";
-  body.textContent = text;
+  body.innerHTML = s15ParseMarkdown(text);
 
   banner.appendChild(label);
   banner.appendChild(body);

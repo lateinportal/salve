@@ -2411,6 +2411,7 @@ function s15OpenCommentModal(stId) {
       var val = textarea.value.trim();
       s15Comments[stId] = val;
       s15UpdateCommentBtn(stId, val);
+      s15RenderCommentBanner(stId, val);
       closeAll();
     }
 
@@ -2479,7 +2480,36 @@ function s15OpenCommentModal(stId) {
   showCodePhase();
 }
 
-// Update the comment button icon/style after saving
+// Render (or remove) a teacher comment banner above the task-title in the section
+function s15RenderCommentBanner(stId, text) {
+  var section = document.getElementById(stId);
+  if (!section) return;
+  var task = section.querySelector(".task");
+  if (!task) return;
+
+  // Remove existing banner if present
+  var existing = task.querySelector(".lc-teacher-comment");
+  if (existing) existing.remove();
+
+  if (!text) return;
+
+  var banner = document.createElement("div");
+  banner.className = "lc-teacher-comment";
+
+  var label = document.createElement("span");
+  label.className = "lc-teacher-comment-label";
+  label.textContent = "Kommentar der Lehrkraft";
+
+  var body = document.createElement("p");
+  body.className = "lc-teacher-comment-body";
+  body.textContent = text;
+
+  banner.appendChild(label);
+  banner.appendChild(body);
+
+  // Insert before the first child of .task (above task-title)
+  task.insertBefore(banner, task.firstChild);
+}
 function s15UpdateCommentBtn(stId, text) {
   var list = document.getElementById("s15-task-list");
   if (!list) return;

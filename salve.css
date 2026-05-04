@@ -124,7 +124,8 @@ body {
 /* ── Roter Kommentar-Badge am Nav-Button (unten-links) ── */
 .nav-btn .comment-badge {
   position: absolute;
-  bottom: -7px;
+  top: 50%;
+  transform: translateY(-50%);
   left: -7px;
   min-width: 16px;
   height: 16px;

@@ -1037,6 +1037,7 @@ function checkS10() {
       );
 
       if (r.state === "correct") {
+        el.classList.add("mk--marked");
         el.classList.add("mk--correct");
       } else if (r.state === "incorrect") {
         el.classList.add("mk--incorrect-marked");
@@ -1075,6 +1076,8 @@ function _applyTokenStates(results) {
       "mk--neutral",
     );
     if (r.state !== "neutral") el.classList.add("mk--" + r.state);
+    // Keep fill visible: correct tokens were marked by the user, so restore mk--marked
+    if (r.state === "correct") el.classList.add("mk--marked");
   });
 }
 
@@ -3325,6 +3328,7 @@ function salveRestore() {
         if (!el) return;
         el.classList.remove("mk--marked","mk--correct","mk--incorrect","mk--incorrect-marked","mk--missed","mk--neutral");
         if (r.state === "correct") {
+          el.classList.add("mk--marked");
           el.classList.add("mk--correct");
         } else if (r.state === "incorrect") {
           el.classList.add("mk--incorrect-marked");
@@ -3362,7 +3366,9 @@ function salveRestore() {
         var expected = el.dataset.correct;
         var given    = d.s11TokenState[id] || null;
         var isOk     = given === expected;
+        // First restore the user's fill colour, then add the border class on top
         el.classList.remove("marked-subjekt","marked-praedikat","marked-versteckt","s11-correct","s11-wrong");
+        if (given) el.classList.add("marked-" + given);
         if (isOk) {
           el.classList.add("s11-correct");
         } else {

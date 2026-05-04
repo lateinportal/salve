@@ -2322,7 +2322,16 @@ function s15ResetStation(id) {
 }
 
 // Storage for comments keyed by station id
-var s15Comments = {};
+// Load persisted comments from localStorage
+var s15Comments = (function() {
+  try { return JSON.parse(localStorage.getItem("salve_comments") || "{}"); }
+  catch(e) { return {}; }
+})();
+
+function s15SaveComments() {
+  try { localStorage.setItem("salve_comments", JSON.stringify(s15Comments)); }
+  catch(e) {}
+}
 
 function s15OpenCommentModal(stId) {
   var overlay = document.getElementById("lc-overlay");
@@ -2410,6 +2419,7 @@ function s15OpenCommentModal(stId) {
     function saveComment() {
       var val = textarea.value.trim();
       s15Comments[stId] = val;
+      s15SaveComments();
       s15UpdateCommentBtn(stId, val);
       s15RenderCommentBanner(stId, val);
       closeAll();
@@ -3412,6 +3422,14 @@ function checkResetArrowState(id) {
 // ── Restore on DOMContentLoaded ──────────────────────────────
 document.addEventListener("DOMContentLoaded", function() {
   salveRestore();
+  // Restore persisted teacher comments
+  Object.keys(s15Comments).forEach(function(stId) {
+    var text = s15Comments[stId];
+    if (text) {
+      s15RenderCommentBanner(stId, text);
+      s15UpdateCommentBtn(stId, text);
+    }
+  });
 });
 
 // ── Confetti ─────────────────────────────────────────────────

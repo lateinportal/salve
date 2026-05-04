@@ -3607,7 +3607,7 @@ body {
 
 .s15-task-row {
   display: grid;
-  grid-template-columns: 24px 1fr 80px 72px 22px 26px;
+  grid-template-columns: 24px 1fr 80px 72px 22px 63px;
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
@@ -3719,6 +3719,7 @@ body {
 .s15-row-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 5px;
   flex-shrink: 0;
 }

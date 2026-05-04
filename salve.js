@@ -1011,12 +1011,8 @@ function checkS10() {
     });
 
     fb.className = "feedback show err";
-    fb.textContent =
-      earnedPoints +
-      " von " +
-      totalPoints +
-      " Sätzen richtig." +
-      " Klicke auf ein gelbes Wort für einen Hinweis.";
+    fb.innerHTML =
+      "Du hast Fehler gemacht. Schau dir die Lösung an und lies dir <a href='#' onclick=\"showSection('s9'); return false;\" style='color:inherit;font-weight:700;text-decoration:underline;'>G4 Prädikatsnomen</a> durch.";
     if (next) next.style.display = "inline-block";
     markNav("s10", false);
   }

@@ -2247,7 +2247,7 @@ function showS15Overview() {
         if (cmtBtn) {
           cmtBtn.addEventListener("click", function(e){
             e.stopPropagation();
-            // Placeholder: Kommentar-Funktion folgt
+            s15OpenCommentModal();
           });
         }
       })(st.id);
@@ -2295,6 +2295,65 @@ function s15ResetStation(id) {
     if (input.value === "1503") {
       closeModal();
       s15DoReset(id);
+    } else {
+      input.classList.add("lc-input-error");
+      error.classList.add("visible");
+      input.value = "";
+      setTimeout(function(){ input.classList.remove("lc-input-error"); }, 400);
+      setTimeout(function(){ input.focus(); }, 50);
+    }
+  }
+
+  function onCancel() { closeModal(); }
+
+  function onKey(e) {
+    if (e.key === "Enter") onConfirm();
+    if (e.key === "Escape") closeModal();
+  }
+
+  function onOverlayClick(e) {
+    if (e.target === overlay) closeModal();
+  }
+
+  btnOk.addEventListener("click", onConfirm);
+  btnCn.addEventListener("click", onCancel);
+  input.addEventListener("keydown", onKey);
+  overlay.addEventListener("click", onOverlayClick);
+}
+
+function s15OpenCommentModal() {
+  var overlay = document.getElementById("lc-overlay");
+  var input   = document.getElementById("lc-input");
+  var error   = document.getElementById("lc-error");
+  var btnOk   = document.getElementById("lc-btn-confirm");
+  var btnCn   = document.getElementById("lc-btn-cancel");
+  var subEl   = overlay ? overlay.querySelector(".lc-sub") : null;
+  if (!overlay) return;
+
+  // Set comment-specific subtitle text
+  if (subEl) subEl.textContent = "Ein Kommentar kann nur mit dem Lehrercode hinzugefügt werden.";
+
+  // Reset modal state
+  input.value = "";
+  input.classList.remove("lc-input-error");
+  error.classList.remove("visible");
+  overlay.classList.add("active");
+  setTimeout(function(){ input.focus(); }, 50);
+
+  function closeModal() {
+    overlay.classList.remove("active");
+    // Restore default subtitle for reset usage
+    if (subEl) subEl.textContent = "Diese Aufgabe kann nur mit dem Lehrercode zurückgesetzt werden.";
+    btnOk.removeEventListener("click", onConfirm);
+    btnCn.removeEventListener("click", onCancel);
+    input.removeEventListener("keydown", onKey);
+    overlay.removeEventListener("click", onOverlayClick);
+  }
+
+  function onConfirm() {
+    if (input.value === "1503") {
+      closeModal();
+      // Kommentar-Funktion: Platzhalter für zukünftige Implementierung
     } else {
       input.classList.add("lc-input-error");
       error.classList.add("visible");

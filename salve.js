@@ -74,7 +74,7 @@ function fbMsg(key, correct, total, navId) {
   } else {
     el.className = "feedback show err";
     el.textContent =
-      "Leider nicht geschafft. Klicke auf ein gelbes Feld um die richtige Antwort einzublenden.";
+      "Du hast Fehler gemacht. Schau dir die Lösung an.";
     showHint(key);
     lockBtn(key);
     if (navId) markNav(navId, false);

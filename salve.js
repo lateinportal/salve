@@ -2247,7 +2247,7 @@ function showS15Overview() {
         if (cmtBtn) {
           cmtBtn.addEventListener("click", function(e){
             e.stopPropagation();
-            s15OpenCommentModal();
+            s15OpenCommentModal(stId);
           });
         }
       })(st.id);
@@ -2321,39 +2321,135 @@ function s15ResetStation(id) {
   overlay.addEventListener("click", onOverlayClick);
 }
 
-function s15OpenCommentModal() {
+// Storage for comments keyed by station id
+var s15Comments = {};
+
+function s15OpenCommentModal(stId) {
   var overlay = document.getElementById("lc-overlay");
+  var modal   = document.getElementById("lc-modal");
   var input   = document.getElementById("lc-input");
   var error   = document.getElementById("lc-error");
   var btnOk   = document.getElementById("lc-btn-confirm");
   var btnCn   = document.getElementById("lc-btn-cancel");
-  var subEl   = overlay ? overlay.querySelector(".lc-sub") : null;
-  if (!overlay) return;
+  var iconEl  = modal ? modal.querySelector(".lc-icon")  : null;
+  var titleEl = modal ? modal.querySelector(".lc-title") : null;
+  var subEl   = modal ? modal.querySelector(".lc-sub")   : null;
+  if (!overlay || !modal) return;
 
-  // Set comment-specific subtitle text
-  if (subEl) subEl.textContent = "Ein Kommentar kann nur mit dem Lehrercode hinzugefügt werden.";
+  // ── Phase 1: Code eingeben ──────────────────────────────────
+  function showCodePhase() {
+    var existing = modal.querySelector(".lc-comment-phase");
+    if (existing) existing.remove();
+    input.style.display = "";
+    error.style.display = "";
+    var actionsEl = modal.querySelector(".lc-actions");
+    if (actionsEl) actionsEl.style.display = "";
 
-  // Reset modal state
-  input.value = "";
-  input.classList.remove("lc-input-error");
-  error.classList.remove("visible");
-  overlay.classList.add("active");
-  setTimeout(function(){ input.focus(); }, 50);
+    if (iconEl)  iconEl.textContent  = "🔑";
+    if (titleEl) titleEl.textContent = "Lehrercode eingeben";
+    if (subEl)   subEl.textContent   = "Ein Kommentar kann nur mit dem Lehrercode hinzugefügt werden.";
 
-  function closeModal() {
-    overlay.classList.remove("active");
-    // Restore default subtitle for reset usage
-    if (subEl) subEl.textContent = "Diese Aufgabe kann nur mit dem Lehrercode zurückgesetzt werden.";
-    btnOk.removeEventListener("click", onConfirm);
-    btnCn.removeEventListener("click", onCancel);
-    input.removeEventListener("keydown", onKey);
+    input.value = "";
+    input.classList.remove("lc-input-error");
+    error.classList.remove("visible");
+    btnOk.textContent = "Bestätigen";
+    btnCn.textContent = "Abbrechen";
+
+    overlay.classList.add("active");
+    setTimeout(function(){ input.focus(); }, 50);
+
+    btnOk.removeEventListener("click", onCodeConfirm);
+    btnCn.removeEventListener("click", onCodeCancel);
+    input.removeEventListener("keydown", onCodeKey);
     overlay.removeEventListener("click", onOverlayClick);
+
+    btnOk.addEventListener("click", onCodeConfirm);
+    btnCn.addEventListener("click", onCodeCancel);
+    input.addEventListener("keydown", onCodeKey);
+    overlay.addEventListener("click", onOverlayClick);
   }
 
-  function onConfirm() {
+  // ── Phase 2: Kommentar verfassen ────────────────────────────
+  function showCommentPhase() {
+    input.style.display  = "none";
+    error.style.display  = "none";
+    var actionsEl = modal.querySelector(".lc-actions");
+    if (actionsEl) actionsEl.style.display = "none";
+
+    if (iconEl)  iconEl.textContent  = "💬";
+    if (titleEl) titleEl.textContent = "Kommentar";
+    if (subEl)   subEl.textContent   = "";
+
+    var existingText = s15Comments[stId] || "";
+    var phase = document.createElement("div");
+    phase.className = "lc-comment-phase";
+
+    var textarea = document.createElement("textarea");
+    textarea.className   = "lc-comment-textarea";
+    textarea.placeholder = "Kommentar hier eingeben …";
+    textarea.value       = existingText;
+    phase.appendChild(textarea);
+
+    var actions = document.createElement("div");
+    actions.className = "lc-comment-actions";
+
+    var cancelBtn = document.createElement("button");
+    cancelBtn.className   = "lc-btn lc-btn-cancel";
+    cancelBtn.textContent = "Abbrechen";
+
+    var saveBtn = document.createElement("button");
+    saveBtn.className   = "lc-btn lc-btn-confirm";
+    saveBtn.textContent = existingText ? "Speichern" : "Speichern";
+
+    actions.appendChild(cancelBtn);
+    actions.appendChild(saveBtn);
+    phase.appendChild(actions);
+    modal.appendChild(phase);
+    setTimeout(function(){ textarea.focus(); textarea.setSelectionRange(textarea.value.length, textarea.value.length); }, 50);
+
+    function saveComment() {
+      var val = textarea.value.trim();
+      s15Comments[stId] = val;
+      s15UpdateCommentBtn(stId, val);
+      closeAll();
+    }
+
+    function closeAll() {
+      overlay.classList.remove("active");
+      input.style.display  = "";
+      error.style.display  = "";
+      if (actionsEl) actionsEl.style.display = "";
+      var ph = modal.querySelector(".lc-comment-phase");
+      if (ph) ph.remove();
+      if (iconEl)  iconEl.textContent  = "🔑";
+      if (titleEl) titleEl.textContent = "Lehrercode eingeben";
+      if (subEl)   subEl.textContent   = "Diese Aufgabe kann nur mit dem Lehrercode zurückgesetzt werden.";
+      btnOk.textContent = "Bestätigen";
+      btnCn.textContent = "Abbrechen";
+      overlay.removeEventListener("click", onOverlayClick2);
+    }
+
+    function onOverlayClick2(e) {
+      if (e.target === overlay) closeAll();
+    }
+
+    saveBtn.addEventListener("click", saveComment);
+    cancelBtn.addEventListener("click", closeAll);
+    textarea.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") closeAll();
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) saveComment();
+    });
+    overlay.addEventListener("click", onOverlayClick2);
+  }
+
+  // ── Code-phase handlers ─────────────────────────────────────
+  function onCodeConfirm() {
     if (input.value === "1503") {
-      closeModal();
-      // Kommentar-Funktion: Platzhalter für zukünftige Implementierung
+      btnOk.removeEventListener("click", onCodeConfirm);
+      btnCn.removeEventListener("click", onCodeCancel);
+      input.removeEventListener("keydown", onCodeKey);
+      overlay.removeEventListener("click", onOverlayClick);
+      showCommentPhase();
     } else {
       input.classList.add("lc-input-error");
       error.classList.add("visible");
@@ -2363,21 +2459,45 @@ function s15OpenCommentModal() {
     }
   }
 
-  function onCancel() { closeModal(); }
+  function onCodeCancel() {
+    overlay.classList.remove("active");
+    btnOk.removeEventListener("click", onCodeConfirm);
+    btnCn.removeEventListener("click", onCodeCancel);
+    input.removeEventListener("keydown", onCodeKey);
+    overlay.removeEventListener("click", onOverlayClick);
+  }
 
-  function onKey(e) {
-    if (e.key === "Enter") onConfirm();
-    if (e.key === "Escape") closeModal();
+  function onCodeKey(e) {
+    if (e.key === "Enter")  onCodeConfirm();
+    if (e.key === "Escape") onCodeCancel();
   }
 
   function onOverlayClick(e) {
-    if (e.target === overlay) closeModal();
+    if (e.target === overlay) onCodeCancel();
   }
 
-  btnOk.addEventListener("click", onConfirm);
-  btnCn.addEventListener("click", onCancel);
-  input.addEventListener("keydown", onKey);
-  overlay.addEventListener("click", onOverlayClick);
+  showCodePhase();
+}
+
+// Update the comment button icon/style after saving
+function s15UpdateCommentBtn(stId, text) {
+  var list = document.getElementById("s15-task-list");
+  if (!list) return;
+  var idx = s15Stations.findIndex(function(s){ return s.id === stId; });
+  if (idx === -1) return;
+  var row = list.children[idx];
+  if (!row) return;
+  var btn = row.querySelector(".s15-row-comment");
+  if (!btn) return;
+  if (text && text.length > 0) {
+    btn.classList.add("s15-row-comment--has-comment");
+    btn.title = "Kommentar bearbeiten";
+    btn.setAttribute("aria-label", "Kommentar bearbeiten");
+  } else {
+    btn.classList.remove("s15-row-comment--has-comment");
+    btn.title = "Kommentar hinzufügen";
+    btn.setAttribute("aria-label", "Kommentar hinzufügen");
+  }
 }
 
 // ── Helpers shared across resets ─────────────────────────────

@@ -3917,6 +3917,50 @@ body {
   transform: translateY(-1px);
 }
 
+/* ── Comment phase (inside Lehrercode modal) ── */
+.lc-comment-phase {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lc-comment-textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 2px solid #e5e7eb;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.55;
+  color: #1a1a1a;
+  background: #f9fafb;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+.lc-comment-textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+  background: #fff;
+}
+.lc-comment-textarea::placeholder {
+  color: #9ca3af;
+}
+
+.lc-comment-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Comment button: has-comment state */
+.s15-row-comment--has-comment {
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  border-color: #93c5fd !important;
+}
+
 /* ── S15 Medal card: pending state after reset ── */
 .s15-medal-card.s15-pending-state {
   background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);

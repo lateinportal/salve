@@ -1218,7 +1218,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function s13ClearCircles() {
   ["A", "B"].forEach(function (z) {
     var btn = document.getElementById("c13-" + z);
-    if (btn) btn.classList.remove("active");
+    if (btn) btn.classList.remove("active", "circle-spotlight", "circle-dim");
   });
 }
 

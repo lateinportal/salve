@@ -1411,7 +1411,6 @@ function checkS13() {
     });
     s13Locked = true;
     document.getElementById("btn-s13").disabled = true;
-    document.getElementById("hint-s13").style.display = "block";
     if (next) next.style.display = "inline-block";
     fb.className = "feedback show err";
     fb.textContent = "Du hast Fehler gemacht. Schau dir die Lösung an.";
@@ -2527,8 +2526,6 @@ function s15DoReset(id) {
       item.style.pointerEvents = "";
       item.onclick = function() { s13ClickItem(d.id); };
     });
-    var hint = document.getElementById("hint-s13");
-    if (hint) hint.style.display = "none";
     s15UpdateRow(id);
     return;
   }
@@ -2972,13 +2969,6 @@ function salveRestore() {
         el.className = "zeit-item color-" + assigned;
       }
     });
-    if (d.s13Locked) {
-      var hint = document.getElementById("hint-s13");
-      var allOk = s13Data.every(function(item) {
-        return d.s13Assign[item.id] === item.ans;
-      });
-      if (hint && !allOk) hint.style.display = "block";
-    }
   }
 
   // ── S2 slot ok/wrong classes (from feedback saved in className) ──

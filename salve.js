@@ -852,7 +852,7 @@ function checkS8() {
     btn.disabled = true;
     fb.className = "feedback show err";
     fb.textContent =
-      "Leider nicht geschafft. Klicke auf ein gelbes Feld um die richtige Antwort einzublenden.";
+      "Du hast Fehler gemacht. Vergleiche mit der Musterlösung.";
     if (next) next.style.display = "inline-block";
     markNav("s8", false);
 

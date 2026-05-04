@@ -698,7 +698,7 @@ function checkS4() {
     btn.disabled = true;
     fb.className = "feedback show err";
     fb.textContent =
-      "Leider nicht geschafft. Klicke auf ein gelbes Feld um die richtige Antwort einzublenden.";
+      "Du hast Fehler gemacht. Schau dir die Lösung an.";
     if (next) next.style.display = "inline-block";
     markNav("s4", false);
 

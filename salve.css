@@ -4002,12 +4002,64 @@ body {
   animation: lc-fade-in 0.2s ease;
 }
 
+/* Header row: label on the left, checkbox on the right */
+.lc-teacher-comment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .lc-teacher-comment-label {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: #b45309;
+}
+
+/* ── Circular "gelesen" checkbox ── */
+.lc-read-checkbox-wrap {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.lc-read-checkbox-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.lc-read-checkbox-custom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #d97706;
+  background: #fff;
+  color: transparent;
+  transition: background 0.18s, border-color 0.18s, color 0.18s, box-shadow 0.18s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.lc-read-checkbox-wrap:hover .lc-read-checkbox-custom {
+  border-color: #b45309;
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.2);
+}
+
+.lc-read-checkbox-input:checked + .lc-read-checkbox-custom {
+  background: #16a34a;
+  border-color: #15803d;
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(22,163,74,0.3);
 }
 
 .lc-teacher-comment-body {

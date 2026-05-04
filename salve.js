@@ -2335,9 +2335,33 @@ var s15Comments = (function() {
   catch(e) { return {}; }
 })();
 
+// Storage for "comment read" status keyed by station id
+var s15CommentsRead = (function() {
+  try { return JSON.parse(localStorage.getItem("salve_comments_read") || "{}"); }
+  catch(e) { return {}; }
+})();
+
 function s15SaveComments() {
   try { localStorage.setItem("salve_comments", JSON.stringify(s15Comments)); }
   catch(e) {}
+}
+
+function s15SaveCommentsRead() {
+  try { localStorage.setItem("salve_comments_read", JSON.stringify(s15CommentsRead)); }
+  catch(e) {}
+}
+
+// Mark a comment as read/unread and update badge
+function s15MarkCommentRead(stId, isRead) {
+  s15CommentsRead[stId] = isRead;
+  s15SaveCommentsRead();
+  // Update nav badge: hide if read
+  var navBtn = document.getElementById("nav-" + stId);
+  if (!navBtn) return;
+  var badge = navBtn.querySelector(".comment-badge");
+  if (badge) {
+    badge.style.display = isRead ? "none" : "";
+  }
 }
 
 function s15OpenCommentModal(stId) {
@@ -2427,6 +2451,11 @@ function s15OpenCommentModal(stId) {
       var val = textarea.value.trim();
       s15Comments[stId] = val;
       s15SaveComments();
+      // Reset read status whenever comment is newly saved/edited
+      if (val) {
+        s15CommentsRead[stId] = false;
+        s15SaveCommentsRead();
+      }
       s15UpdateCommentBtn(stId, val);
       s15RenderCommentBanner(stId, val);
       closeAll();
@@ -2541,15 +2570,46 @@ function s15RenderCommentBanner(stId, text) {
   var banner = document.createElement("div");
   banner.className = "lc-teacher-comment";
 
+  // Header row: label + read-checkbox
+  var header = document.createElement("div");
+  header.className = "lc-teacher-comment-header";
+
   var label = document.createElement("span");
   label.className = "lc-teacher-comment-label";
   label.textContent = "Kommentar der Lehrkraft";
+
+  // Circular "gelesen" checkbox
+  var checkId = "lc-read-chk-" + stId;
+  var checkWrap = document.createElement("label");
+  checkWrap.className = "lc-read-checkbox-wrap";
+  checkWrap.htmlFor = checkId;
+  checkWrap.title = "Als gelesen markieren";
+
+  var checkInput = document.createElement("input");
+  checkInput.type = "checkbox";
+  checkInput.id = checkId;
+  checkInput.className = "lc-read-checkbox-input";
+  checkInput.checked = !!s15CommentsRead[stId];
+  checkInput.addEventListener("change", function() {
+    s15MarkCommentRead(stId, checkInput.checked);
+  });
+
+  var checkCustom = document.createElement("span");
+  checkCustom.className = "lc-read-checkbox-custom";
+  // Checkmark SVG inside
+  checkCustom.innerHTML = '<svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg>';
+
+  checkWrap.appendChild(checkInput);
+  checkWrap.appendChild(checkCustom);
+
+  header.appendChild(label);
+  header.appendChild(checkWrap);
 
   var body = document.createElement("p");
   body.className = "lc-teacher-comment-body";
   body.innerHTML = s15ParseMarkdown(text);
 
-  banner.appendChild(label);
+  banner.appendChild(header);
   banner.appendChild(body);
 
   // Insert before the first child of .task (above task-title)
@@ -2589,6 +2649,8 @@ function s15UpdateCommentBtn(stId, text) {
     badge.className = "comment-badge";
     badge.textContent = "1";
     badge.title = "Kommentar der Lehrkraft";
+    // Hide badge if already marked as read
+    if (s15CommentsRead[stId]) badge.style.display = "none";
     navBtn.appendChild(badge);
   }
 }

@@ -121,6 +121,27 @@ body {
   color: #fff;
   font-weight: 700;
 }
+/* ── Roter Kommentar-Badge am Nav-Button (unten-links) ── */
+.nav-btn .comment-badge {
+  position: absolute;
+  bottom: -7px;
+  left: -7px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #dc2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: #fff;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  z-index: 2;
+}
 .main-content {
   flex: 1;
   min-width: 0;

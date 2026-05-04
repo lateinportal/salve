@@ -2556,22 +2556,40 @@ function s15RenderCommentBanner(stId, text) {
   task.insertBefore(banner, task.firstChild);
 }
 function s15UpdateCommentBtn(stId, text) {
+  // ── Overview list button ──
   var list = document.getElementById("s15-task-list");
-  if (!list) return;
-  var idx = s15Stations.findIndex(function(s){ return s.id === stId; });
-  if (idx === -1) return;
-  var row = list.children[idx];
-  if (!row) return;
-  var btn = row.querySelector(".s15-row-comment");
-  if (!btn) return;
+  if (list) {
+    var idx = s15Stations.findIndex(function(s){ return s.id === stId; });
+    if (idx !== -1) {
+      var row = list.children[idx];
+      if (row) {
+        var btn = row.querySelector(".s15-row-comment");
+        if (btn) {
+          if (text && text.length > 0) {
+            btn.classList.add("s15-row-comment--has-comment");
+            btn.title = "Kommentar bearbeiten";
+            btn.setAttribute("aria-label", "Kommentar bearbeiten");
+          } else {
+            btn.classList.remove("s15-row-comment--has-comment");
+            btn.title = "Kommentar hinzufügen";
+            btn.setAttribute("aria-label", "Kommentar hinzufügen");
+          }
+        }
+      }
+    }
+  }
+
+  // ── Roter Badge am Nav-Button ──
+  var navBtn = document.getElementById("nav-" + stId);
+  if (!navBtn) return;
+  var old = navBtn.querySelector(".comment-badge");
+  if (old) old.remove();
   if (text && text.length > 0) {
-    btn.classList.add("s15-row-comment--has-comment");
-    btn.title = "Kommentar bearbeiten";
-    btn.setAttribute("aria-label", "Kommentar bearbeiten");
-  } else {
-    btn.classList.remove("s15-row-comment--has-comment");
-    btn.title = "Kommentar hinzufügen";
-    btn.setAttribute("aria-label", "Kommentar hinzufügen");
+    var badge = document.createElement("span");
+    badge.className = "comment-badge";
+    badge.textContent = "1";
+    badge.title = "Kommentar der Lehrkraft";
+    navBtn.appendChild(badge);
   }
 }
 
